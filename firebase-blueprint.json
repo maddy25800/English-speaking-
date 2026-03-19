@@ -1,0 +1,69 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and IELTS target settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "targetBand": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Topic": {
+      "title": "Topic",
+      "description": "IELTS speaking topic.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "part": { "type": "number" },
+        "questions": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "part"]
+    },
+    "Attempt": {
+      "title": "Attempt",
+      "description": "User's speaking attempt and AI feedback.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "topicId": { "type": "string" },
+        "transcript": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "scores": {
+          "type": "object",
+          "properties": {
+            "fluency": { "type": "number" },
+            "grammar": { "type": "number" },
+            "vocabulary": { "type": "number" },
+            "overall": { "type": "number" }
+          }
+        },
+        "feedback": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "topicId", "transcript"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile data."
+    },
+    "/topics/{topicId}": {
+      "schema": "Topic",
+      "description": "IELTS speaking topics."
+    },
+    "/attempts/{attemptId}": {
+      "schema": "Attempt",
+      "description": "User speaking attempts and feedback."
+    }
+  }
+}

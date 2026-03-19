@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid is string &&
+             data.email is string;
+    }
+
+    function isValidAttempt(data) {
+      return data.keys().hasAll(['userId', 'topicId', 'transcript']) &&
+             data.userId == request.auth.uid &&
+             data.transcript is string &&
+             data.transcript.size() < 10000;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    // Topics Collection (Publicly readable, Admin writable)
+    match /topics/{topicId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only via manual console or admin script
+    }
+
+    // Attempts Collection
+    match /attempts/{attemptId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && isValidAttempt(request.resource.data);
+      allow update, delete: if isDocOwner();
+    }
+  }
+}

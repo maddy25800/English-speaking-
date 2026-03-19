@@ -1,0 +1,7 @@
+{
+  "name": "English speaking app",
+  "description": "IELTS Speaking Coach with AI feedback and scoring.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
